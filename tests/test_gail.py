@@ -108,13 +108,13 @@ def test_pretrain_images(tmp_path):
     del dataset, model, env
 
 
-def test_gail_callback():
+def test_gail_callback(tmp_path):
     dataset = ExpertDataset(expert_path=EXPERT_PATH_PENDULUM, traj_limitation=10,
                             sequential_preprocessing=True, verbose=0)
     model = GAIL("MlpPolicy", "Pendulum-v0", dataset)
-    checkpoint_callback = CheckpointCallback(save_freq=500, save_path='./logs/gail/', name_prefix='gail')
+    checkpoint_callback = CheckpointCallback(save_freq=500, save_path=tmp_path / 'logs/gail/', name_prefix='gail')
     model.learn(total_timesteps=1000, callback=checkpoint_callback)
-    shutil.rmtree('./logs/gail/')
+    shutil.rmtree(tmp_path / 'logs/gail/')
     del dataset, model
 
 
