@@ -341,7 +341,6 @@ class TRPO(ActorCriticRLModel):
                         observation, action = seg["observations"], seg["actions"]
                         atarg, tdlamret = seg["adv"], seg["tdlamret"]
 
-
                         vpredbefore = seg["vpred"]  # predicted value function before update
                         atarg = (atarg - atarg.mean()) / (atarg.std() + 1e-8)  # standardized advantage function estimate
 
@@ -432,7 +431,6 @@ class TRPO(ActorCriticRLModel):
                                                                          shuffle=True):
                                     grad = self.allmean(self.compute_vflossandgrad(mbob, mbob, mbret, sess=self.sess))
                                     self.vfadam.update(grad, self.vf_stepsize)
-
 
                     # Stop training early (triggered by the callback)
                     if not seg.get('continue_training', True):  # pytype: disable=attribute-error

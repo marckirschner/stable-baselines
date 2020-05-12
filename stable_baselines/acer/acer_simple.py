@@ -233,7 +233,6 @@ class ACER(ActorCriticRLModel):
                                    _init_setup_model=_init_setup_model, policy_kwargs=policy_kwargs,
                                    seed=seed, n_cpu_tf_sess=n_cpu_tf_sess)
 
-
         if _init_setup_model:
             self.setup_model()
 
@@ -605,7 +604,6 @@ class ACER(ActorCriticRLModel):
 
                 names_ops, values_ops = self._train_step(obs, actions, rewards, dones, mus, self.initial_state, masks,
                                                          self.num_timesteps, writer)
-
 
                 if self.verbose >= 1 and (int(steps / self.n_batch) % log_interval == 0):
                     logger.record_tabular("total_timesteps", self.num_timesteps)

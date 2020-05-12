@@ -390,7 +390,6 @@ class TD3(OffPolicyRLModel):
 
                     callback.on_rollout_start()
 
-
                 episode_rewards[-1] += reward_
                 if done:
                     if self.action_noise is not None:
