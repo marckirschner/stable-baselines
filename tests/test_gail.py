@@ -20,7 +20,7 @@ EXPERT_PATH_DISCRETE = "stable_baselines/gail/dataset/expert_cartpole.npz"
 
 @pytest.mark.parametrize("expert_env", [('Pendulum-v0', EXPERT_PATH_PENDULUM, True),
                                         ('CartPole-v1', EXPERT_PATH_DISCRETE, False)])
-def test_gail(expert_env):
+def test_gail(tmp_path, expert_env):
     env_id, expert_path, load_from_memory = expert_env
     env = gym.make(env_id)
 
@@ -36,8 +36,8 @@ def test_gail(expert_env):
                  expert_dataset=dataset, hidden_size_adversary=64, verbose=0)
 
     model.learn(1000)
-    model.save("GAIL-{}".format(env_id))
-    model = model.load("GAIL-{}".format(env_id), env=env)
+    model.save(tmp_path / "GAIL-{}".format(env_id))
+    model = model.load(tmp_path / "GAIL-{}".format(env_id), env=env)
     model.learn(1000)
 
     evaluate_policy(model, env, n_eval_episodes=5)
@@ -51,7 +51,7 @@ def test_gail(expert_env):
                                             (A2C, 'MlpLstmPolicy', 'CartPole-v1', 1, 10),
                                             (A2C, 'CnnPolicy', 'BreakoutNoFrameskip-v4', 8, 1),
                                           ])
-def test_generate(generate_env):
+def test_generate(tmp_path, generate_env):
     model, policy, env_name, n_env, n_episodes = generate_env
 
     if n_env > 1:
@@ -60,8 +60,8 @@ def test_generate(generate_env):
     else:
         model = model(policy, env_name, verbose=0)
 
-    dataset = generate_expert_traj(model, 'expert', n_timesteps=1000, n_episodes=n_episodes,
-                                   image_folder='test_recorded_images')
+    dataset = generate_expert_traj(model, tmp_path / 'expert', n_timesteps=1000, n_episodes=n_episodes,
+                                   image_folder=tmp_path / 'test_recorded_images')
 
     assert set(dataset.keys()).issuperset(['actions', 'obs', 'rewards', 'episode_returns', 'episode_starts'])
     assert sum(dataset['episode_starts']) == n_episodes
@@ -71,16 +71,16 @@ def test_generate(generate_env):
         if key != 'episode_returns':
             assert val.shape[0] == n_timesteps, "inconsistent number of timesteps at '{}'".format(key)
 
-    dataset_loaded = np.load('expert.npz', allow_pickle=True)
+    dataset_loaded = np.load(tmp_path / 'expert.npz', allow_pickle=True)
     assert dataset.keys() == dataset_loaded.keys()
     for key in dataset.keys():
         assert (dataset[key] == dataset_loaded[key]).all(), "different data at '{}'".format(key)
     # Cleanup folder
-    if os.path.isdir('test_recorded_images'):
-        shutil.rmtree('test_recorded_images')
+    if os.path.isdir(tmp_path / 'test_recorded_images'):
+        shutil.rmtree(tmp_path / 'test_recorded_images')
 
 
-def test_generate_callable():
+def test_generate_callable(tmp_path):
     """
     Test generating expert trajectories with a callable.
     """
@@ -88,22 +88,22 @@ def test_generate_callable():
     # Here the expert is a random agent
     def dummy_expert(_obs):
         return env.action_space.sample()
-    generate_expert_traj(dummy_expert, 'dummy_expert_cartpole', env, n_timesteps=0, n_episodes=10)
+    generate_expert_traj(dummy_expert, tmp_path / 'dummy_expert_cartpole', env, n_timesteps=0, n_episodes=10)
 
 
-def test_pretrain_images():
+def test_pretrain_images(tmp_path):
     env = make_atari_env("PongNoFrameskip-v4", num_env=1, seed=0)
     env = VecFrameStack(env, n_stack=4)
     model = PPO2('CnnPolicy', env)
-    generate_expert_traj(model, 'expert_pong', n_timesteps=0, n_episodes=1,
-                         image_folder='pretrain_recorded_images')
+    generate_expert_traj(model, tmp_path / 'expert_pong', n_timesteps=0, n_episodes=1,
+                         image_folder=tmp_path / 'pretrain_recorded_images')
 
-    expert_path = 'expert_pong.npz'
+    expert_path = tmp_path / 'expert_pong.npz'
     dataset = ExpertDataset(expert_path=expert_path, traj_limitation=1, batch_size=32,
                             sequential_preprocessing=True)
     model.pretrain(dataset, n_epochs=2)
 
-    shutil.rmtree('pretrain_recorded_images')
+    shutil.rmtree(tmp_path / 'pretrain_recorded_images')
     env.close()
     del dataset, model, env
 
@@ -119,7 +119,7 @@ def test_gail_callback():
 
 
 @pytest.mark.parametrize("model_class", [A2C, ACKTR, GAIL, DDPG, PPO1, PPO2, SAC, TD3, TRPO])
-def test_behavior_cloning_box(model_class):
+def test_behavior_cloning_box(tmp_path, model_class):
     """
     Behavior cloning with continuous actions.
     """
@@ -127,17 +127,17 @@ def test_behavior_cloning_box(model_class):
                             sequential_preprocessing=True, verbose=0)
     model = model_class("MlpPolicy", "Pendulum-v0")
     model.pretrain(dataset, n_epochs=20)
-    model.save("test-pretrain")
+    model.save(tmp_path / "test-pretrain")
     del dataset, model
 
 
 @pytest.mark.parametrize("model_class", [A2C, ACER, ACKTR, DQN, GAIL, PPO1, PPO2, TRPO])
-def test_behavior_cloning_discrete(model_class):
+def test_behavior_cloning_discrete(tmp_path, model_class):
     dataset = ExpertDataset(expert_path=EXPERT_PATH_DISCRETE, traj_limitation=10,
                             sequential_preprocessing=True, verbose=0)
     model = model_class("MlpPolicy", "CartPole-v1")
     model.pretrain(dataset, n_epochs=10)
-    model.save("test-pretrain")
+    model.save(tmp_path / "test-pretrain")
     del dataset, model
 
 
