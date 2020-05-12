@@ -26,6 +26,7 @@ Bug Fixes:
 - Fix consistency in ``setup_model()`` for SAC, ``target_entropy`` now uses ``self.action_space`` instead of ``self.env.action_space`` (@solliet)
 - Fix reward threshold in ``test_identity.py``
 - Partially fix tensorboard indexing for PPO2 (@enderdead)
+- Fixed potential bug in ``DummyVecEnv`` where ``copy()`` was used instead of ``deepcopy()``
 - Fixed a bug in ``GAIL`` where the dataloader was not available after saving, causing an error when using ``CheckpointCallback``
 
 Deprecations:
@@ -33,12 +34,20 @@ Deprecations:
 
 Others:
 ^^^^^^^
+- Added ``version.txt`` to manage version number in an easier way
+- Added ``.readthedocs.yml`` to install requirements with read the docs
 
 Documentation:
 ^^^^^^^^^^^^^^
 - Fix typos (@caburu)
 - Fix typos in PPO2 (@kvenkman)
 - Removed ``stable_baselines\deepq\experiments\custom_cartpole.py`` (@aakash94)
+- Added Google's motion imitation project
+- Added documentation page for monitor
+- Fixed typos and update ``VecNormalize`` example to show normalization at test-time
+- Fixed ``train_mountaincar`` description
+- Added imitation baselines project
+- Updated install instructions
 
 
 Release 2.10.0 (2020-03-11)
