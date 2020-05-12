@@ -30,6 +30,8 @@ class ExpertDataset(object):
     :param sequential_preprocessing: (bool) Do not use subprocess to preprocess
         the data (slower but use less memory for the CI)
     """
+    # Excluded attribute when pickling the object
+    EXCLUDED_KEYS = {'dataloader', 'train_loader', 'val_loader'}
 
     def __init__(self, expert_path=None, traj_data=None, train_fraction=0.7, batch_size=64,
                  traj_limitation=-1, randomize=True, verbose=1, sequential_preprocessing=False):
@@ -127,9 +129,7 @@ class ExpertDataset(object):
         Excludes processes that are not pickleable
         """
         # Remove processes in order to pickle the dataset.
-        excluded = {'dataloader', 'train_loader', 'val_loader'}
-        state = {key:val for key, val in self.__dict__.items() if key not in excluded}
-        return state
+        return {key: val for key, val in self.__dict__.items() if key not in self.EXCLUDED_KEYS}
 
     def __setstate__(self, state):
         """
@@ -141,7 +141,7 @@ class ExpertDataset(object):
         :param state: (dict)
         """
         self.__dict__.update(state)
-        for excluded_key in {'dataloader', 'train_loader', 'val_loader'}:
+        for excluded_key in self.EXCLUDED_KEYS:
             assert excluded_key not in state
         self.dataloader = None
         self.train_loader = None
