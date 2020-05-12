@@ -192,6 +192,7 @@ SPACES = collections.OrderedDict([
     ('continuous', gym.spaces.Box(low=np.zeros(2), high=np.ones(2))),
 ])
 
+
 def check_vecenv_spaces(vec_env_class, space, obs_assert):
     """Helper method to check observation spaces in vectorized environments."""
     def make_env():
@@ -300,10 +301,12 @@ class CustomWrapperB(VecNormalize):
     def name_test(self):
         return self.__class__
 
+
 class CustomWrapperBB(CustomWrapperB):
     def __init__(self, venv):
         CustomWrapperB.__init__(self, venv)
         self.var_bb = 'bb'
+
 
 def test_vecenv_wrapper_getattr():
     def make_env():

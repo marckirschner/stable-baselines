@@ -344,7 +344,7 @@ class ACER(ActorCriticRLModel):
                         rho_i = tf.reshape(f_i, [-1, 1]) / (self.mu_ph + eps)
                         rho_i_ = tf.reshape(f_i_, [-1, 1]) / (self.mu_ph + eps)
 
-                        qret = q_retrace(self.reward_ph, self.done_ph, q_i, value, tf.pow(rho_i, 1/self.n_act),
+                        qret = q_retrace(self.reward_ph, self.done_ph, q_i, value, tf.pow(rho_i, 1 / self.n_act),
                                          self.n_envs, self.n_steps, self.gamma)
                     else:
                         # strip off last step

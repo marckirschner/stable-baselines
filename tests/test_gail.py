@@ -43,6 +43,7 @@ def test_gail(expert_env):
     evaluate_policy(model, env, n_eval_episodes=5)
     del dataset, model
 
+
 @pytest.mark.parametrize("generate_env", [
                                             (SAC, 'MlpPolicy', 'Pendulum-v0', 1, 10),
                                             (DQN, 'MlpPolicy', 'CartPole-v1', 1, 10),

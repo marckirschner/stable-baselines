@@ -18,6 +18,7 @@ MODEL_LIST = [
     TRPO,
 ]
 
+
 @pytest.mark.parametrize("model_class", MODEL_LIST)
 def test_load_parameters(request, model_class):
     """
