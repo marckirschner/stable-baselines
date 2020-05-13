@@ -120,7 +120,10 @@ class ExpertDataset(object):
                                      sequential=self.sequential_preprocessing)
 
     def __del__(self):
-        del self.dataloader, self.train_loader, self.val_loader
+        # Exit processes if needed
+        for key in self.EXCLUDED_KEYS:
+            if self.__dict__.get(key) is not None:
+                del self.self.__dict__[key]
 
     def __getstate__(self):
         """
