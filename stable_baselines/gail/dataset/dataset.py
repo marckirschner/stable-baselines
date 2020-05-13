@@ -123,7 +123,7 @@ class ExpertDataset(object):
         # Exit processes if needed
         for key in self.EXCLUDED_KEYS:
             if self.__dict__.get(key) is not None:
-                del self.self.__dict__[key]
+                del self.__dict__[key]
 
     def __getstate__(self):
         """
